@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script defer src="/static/admin.js"></script>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Admin Panel</h1>
+
+    <h2>Create Course</h2>
+    <input id="courseTitle" placeholder="Title">
+    <input id="courseDesc" placeholder="Description">
+    <button onclick="createCourse()">Create</button>
+
+    <hr>
+
+    <h2>Create Lesson</h2>
+    <input id="lessonCourseId" placeholder="Course ID">
+    <input id="lessonTitle" placeholder="Lesson title">
+    <textarea id="lessonContent" placeholder="Content"></textarea>
+    <button onclick="createLesson()">Create</button>
+
+    <hr>
+
+    <h2>Create Test</h2>
+    <input id="testLessonId" placeholder="Lesson ID">
+
+    <div id="questions"></div>
+
+    <button onclick="addQuestion()">Add Question</button>
+    <button onclick="createTest()">Create Test</button>
+
+</div>
+
+</body>
+</html>
