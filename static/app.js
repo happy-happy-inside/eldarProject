@@ -1,4 +1,4 @@
-const API = "http://localhost:8080"
+const API = ""
 
 // ===== ROUTING =====
 
@@ -13,17 +13,18 @@ window.onload = () => {
 // ===== COURSES =====
 
 async function loadCourses() {
-    const res = await fetch(API + "/courses")
+    const res = await fetch("/courses")
     const data = await res.json()
 
     const div = document.getElementById("courses")
+    div.innerHTML = ""
 
     data.forEach(c => {
         div.innerHTML += `
-            <div>
+            <div class="card">
                 <h3>${c.title}</h3>
                 <p>${c.description}</p>
-                <a href="/course?id=${c.id}">Open</a>
+                <a href="/course?id=${c.id}">Open →</a>
             </div>
         `
     })
@@ -34,21 +35,28 @@ async function loadCourses() {
 async function loadCourse() {
     const id = new URLSearchParams(window.location.search).get("id")
 
-    const res = await fetch(API + "/lessons")
+    // Загружаем курс (для заголовка)
+    const courseRes = await fetch("/courses/" + id)
+    const course = await courseRes.json()
+
+    document.querySelector("h1").innerText = course.title
+
+    // Загружаем уроки
+    const res = await fetch("/lessons")
     const lessons = await res.json()
 
     const div = document.getElementById("lessons")
+    div.innerHTML = ""
 
     lessons
-        .filter(l => l.course_id == id)
+        .filter(l => l.course_id === Number(id))
         .forEach(l => {
-       div.innerHTML += `
-    <div class="card">
-        <h3>${c.title}</h3>
-        <p>${c.description}</p>
-        <a href="/course?id=${c.id}">Open course →</a>
-    </div>
-`
+            div.innerHTML += `
+                <div class="card">
+                    <h3>${l.title}</h3>
+                    <a href="/lesson?id=${l.id}">Open lesson →</a>
+                </div>
+            `
         })
 }
 
@@ -59,37 +67,34 @@ let currentTest = []
 async function loadLesson() {
     const id = new URLSearchParams(window.location.search).get("id")
 
-    const res = await fetch(API + "/lessons/" + id)
+    const res = await fetch("/lessons/" + id)
     const lesson = await res.json()
 
     document.getElementById("lessonTitle").innerText = lesson.title
     document.getElementById("content").innerText = lesson.content
 
-    // загрузка теста
-    const testRes = await fetch(API + "/tests/" + id)
+    // тест
+    const testRes = await fetch("/tests/" + id)
     const test = await testRes.json()
 
     currentTest = test
 
     const div = document.getElementById("test")
+    div.innerHTML = ""
 
     test.forEach(q => {
-        div.innerHTML += `<p><b>${q.text}</b></p>`
+        div.innerHTML += `
+            <div class="card">
+                <p><b>${q.text}</b></p>
 
-        q.answers.forEach(a => {
-          div.innerHTML += `
-    <div class="card">
-        <p><b>${q.text}</b></p>
-
-        ${q.answers.map(a => `
-            <label>
-                <input type="radio" name="q${q.id}" value="${a.id}">
-                ${a.answer}
-            </label><br>
-        `).join("")}
-    </div>
-`
-        })
+                ${q.answers.map(a => `
+                    <label>
+                        <input type="radio" name="q${q.id}" value="${a.id}">
+                        ${a.answer}
+                    </label><br>
+                `).join("")}
+            </div>
+        `
     })
 }
 
@@ -107,7 +112,7 @@ async function submitTest() {
 
     const testId = currentTest[0]?.test_id || 1
 
-    const res = await fetch(API + "/submit/" + testId, {
+    const res = await fetch("/submit/" + testId, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
