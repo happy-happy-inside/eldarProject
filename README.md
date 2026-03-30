@@ -36,7 +36,7 @@ Markdown
   ├── index.html  │   
   ├── course.html │   
   ├── lesson.html │   
-  └── admin.html 
+  └── admin.html  │
   ├── /static 
   │   
   ├── app.js 
@@ -61,60 +61,43 @@ Markdown
 `bash
 docker-compose up --build
 3. Доступ
-Главная: http://localhost:8080⁠�
-Админка: http://localhost:8080/admin⁠�
+Главная: http://localhost:8080⁠
+Админка: http://localhost:8080/admin⁠
 🗄 База данных
 Используется PostgreSQL.
 Таблицы:
 courses
-поле
-тип
-id
-SERIAL
-title
-TEXT
-description
-TEXT
+поле         тип
+id           SERIAL
+title        TEXT
+description  TEXT
+
 lessons
-поле
-тип
-id
-SERIAL
-course_id
-INT
-title
-TEXT
-content
-TEXT
-position
-INT
+поле          тип
+id            SERIAL
+course_id     INT
+title         TEXT
+content       TEXT
+position      INT
+
 tests
-поле
-тип
-id
-SERIAL
-lesson_id
-INT
+поле          тип
+id            SERIAL
+lesson_id     INT
+
 questions
-поле
-тип
-id
-SERIAL
-test_id
-INT
-text
-TEXT
+поле          тип
+id            SERIAL
+test_id       INT
+text          TEXT
+
 answers
-поле
-тип
-id
-SERIAL
-question_id
-INT
-answer
-TEXT
-is_correct
-BOOLEAN
+поле          тип
+id            SERIAL
+question_id   INT
+answer        TEXT
+is_correct    BOOLEAN
+
 🔌 API
 📘 Курсы
 Получить все курсы
