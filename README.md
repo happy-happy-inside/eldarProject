@@ -29,7 +29,21 @@ Markdown
 ---
 
 # 🧱 Архитектура
-. ├── main.go              # Backend (Go) ├── Dockerfile ├── docker-compose.yml ├── /templates │   ├── index.html │   ├── course.html │   ├── lesson.html │   └── admin.html ├── /static │   ├── app.js │   ├── admin.js │   └── style.css
+  ├── main.go              # Backend (Go) 
+  ├── Dockerfile 
+  ├── docker-compose.yml 
+  ├── /templates  │   
+  ├── index.html  │   
+  ├── course.html │   
+  ├── lesson.html │   
+  └── admin.html 
+  ├── /static 
+  │   
+  ├── app.js 
+  │     
+  ├── admin.js 
+  │   
+  └── style.css
 
 ---
 
