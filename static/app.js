@@ -14,6 +14,8 @@ function loadTheme() {
     }
 }
 
+let allCourses = []
+
 // ===== ROUTING =====
 
 window.onload = () => {
@@ -26,23 +28,39 @@ window.onload = () => {
 }
 
 // ===== COURSES =====
-
 async function loadCourses() {
     const res = await fetch("/courses")
     const data = await res.json()
 
+    allCourses = data
+
+    renderCourses(data)
+}
+
+function renderCourses(courses) {
     const div = document.getElementById("courses")
     div.innerHTML = ""
 
-    data.forEach(c => {
+    courses.forEach(c => {
         div.innerHTML += `
-           <div class="card">
-        <h3>📘 ${c.title}</h3>
-        <p>${c.description}</p>
-        <a href="/course?id=${c.id}">Перейти →</a>
-    </div>
+            <div class="card">
+                <h3>📘 ${c.title}</h3>
+                <p>${c.description}</p>
+                <a href="/course?id=${c.id}">Open →</a>
+            </div>
         `
     })
+}
+
+function filterCourses() {
+    const query = document.getElementById("searchInput").value.toLowerCase()
+
+    const filtered = allCourses.filter(c =>
+        c.title.toLowerCase().includes(query) ||
+        c.description.toLowerCase().includes(query)
+    )
+
+    renderCourses(filtered)
 }
 
 // ===== COURSE =====
