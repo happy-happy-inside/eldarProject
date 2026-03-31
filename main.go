@@ -17,6 +17,25 @@ import (
 
 var db *sql.DB
 
+const adminUser = "admin"
+const adminPass = "1234"
+
+// ====== AUTH ==========
+
+func basicAuth(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, pass, ok := r.BasicAuth()
+
+		if !ok || user != adminUser || pass != adminPass {
+			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		next(w, r)
+	}
+}
+
 // ===== MODELS =====
 
 type Course struct {
@@ -79,10 +98,9 @@ func main() {
 
 	// ===== STATIC =====
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-	http.HandleFunc("/admin", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/admin", basicAuth(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "templates/admin.html")
-	})
-
+	}))
 	// ===== PAGES =====
 	http.HandleFunc("/course", coursePage)
 	http.HandleFunc("/lesson", lessonPage)
