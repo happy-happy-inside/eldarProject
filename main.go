@@ -29,6 +29,7 @@ type Lesson struct {
 	Title    string `json:"title"`
 	Content  string `json:"content"`
 	Position int    `json:"position"`
+	Image    string `json:"image"`
 }
 
 type Answer struct {
@@ -103,7 +104,8 @@ func createTables() {
 		course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,
 		title TEXT,
 		content TEXT,
-		position INTEGER
+		position INTEGERl,
+		image TEXT
 	);
 
 	CREATE TABLE IF NOT EXISTS tests (
@@ -215,10 +217,9 @@ func lessonsHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewDecoder(r.Body).Decode(&l)
 
 		db.QueryRow(
-			"INSERT INTO lessons (course_id,title,content,position) VALUES ($1,$2,$3,$4) RETURNING id",
-			l.CourseID, l.Title, l.Content, l.Position,
+			"INSERT INTO lessons (course_id, title, content, image, position) VALUES ($1,$2,$3,$4,$5) RETURNING id",
+			l.CourseID, l.Title, l.Content, l.Image, l.Position,
 		).Scan(&l.ID)
-
 		json.NewEncoder(w).Encode(l)
 	}
 }
