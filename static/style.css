@@ -2,7 +2,7 @@
     --bg: #f5f7fa;
     --text: #222;
     --card: #ffffff;
-    --primary: #4CAF50;
+    --primary: #D62020;
     --border: #ddd;
 }
 
@@ -10,7 +10,7 @@ body.dark {
     --bg: #1e1e1e;
     --text: #f1f1f1;
     --card: #2a2a2a;
-    --primary: #66bb6a;
+    --primary: #7020D6;
     --border: #444;
 }
 
