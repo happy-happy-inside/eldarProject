@@ -19,12 +19,21 @@ function loadTheme() {
 
 window.onload = () => {
     loadTheme()
+
     const path = window.location.pathname
-    
-    if (path === "/") loadCourses()
-        if (path.startsWith("/course")) loadCourse()
-            if (path.startsWith("/lesson")) loadLesson()
-            }
+
+    if (path === "/") {
+        loadCourses()
+    }
+
+    if (path.startsWith("/course")) {
+        loadCourse()
+    }
+
+    if (path.startsWith("/lesson")) {
+        loadLesson()
+    }
+}
         
 // ===== COURSES =====
 
@@ -68,47 +77,34 @@ function filterCourses() {
     renderCourses(filtered)
 }
 
-// ===== PAGE =====
+// ===== COURSE =====
 
-let currentPage = 1
-const perPage = 5
+async function loadCourse() {
+    const id = new URLSearchParams(window.location.search).get("id")
 
-function renderPage() {
-    const start = (currentPage - 1) * perPage
-    const end = start + perPage
+    // Загружаем курс (для заголовка)
+    const courseRes = await fetch("/courses/" + id)
+    const course = await courseRes.json()
 
-    const pageCourses = allCourses.slice(start, end)
+    document.querySelector("h1").innerText = course.title
 
-    renderCourses(pageCourses)
-    renderPagination()
-}
+    // Загружаем уроки
+    const res = await fetch("/lessons")
+    const lessons = await res.json()
 
-function renderPagination() {
-    const totalPages = Math.ceil(allCourses.length / perPage)
-    const div = document.getElementById("pagination")
-
+    const div = document.getElementById("lessons")
     div.innerHTML = ""
 
-    if (currentPage > 1) {
-        div.innerHTML += `<button onclick="changePage(${currentPage - 1})">←</button>`
-    }
-
-    for (let i = 1; i <= totalPages; i++) {
-        div.innerHTML += `
-            <button onclick="changePage(${i})">
-                ${i}
-            </button>
-        `
-    }
-
-    if (currentPage < totalPages) {
-        div.innerHTML += `<button onclick="changePage(${currentPage + 1})">→</button>`
-    }
-}
-
-function changePage(page) {
-    currentPage = page
-    renderPage()
+    lessons
+        .filter(l => l.course_id === Number(id))
+        .forEach(l => {
+            div.innerHTML += `
+       <div class="card">
+    <h3>📖 ${l.title}</h3>
+    <a href="/lesson?id=${l.id}">Открыть →</a>
+</div>
+            `
+        })
 }
 
 // ===== LESSON + TEST =====
@@ -123,6 +119,9 @@ async function loadLesson() {
 
     document.getElementById("lessonTitle").innerText = lesson.title
     document.getElementById("content").innerText = lesson.content
+        if (lesson.image) {
+    document.getElementById("lessonImage").src = lesson.image
+}
 
     // тест
     const testRes = await fetch("/tests/" + id)
@@ -174,4 +173,46 @@ async function submitTest() {
     const result = await res.json()
 
     document.getElementById("result").innerText = "Score: " + result.score + "%"
+}
+
+//======= PAGES ========
+let currentPage = 1
+const perPage = 5
+
+function renderPage() {
+    const start = (currentPage - 1) * perPage
+    const end = start + perPage
+
+    const pageCourses = allCourses.slice(start, end)
+
+    renderCourses(pageCourses)
+    renderPagination()
+}
+
+function renderPagination() {
+    const totalPages = Math.ceil(allCourses.length / perPage)
+    const div = document.getElementById("pagination")
+
+    div.innerHTML = ""
+
+    if (currentPage > 1) {
+        div.innerHTML += `<button onclick="changePage(${currentPage - 1})">←</button>`
+    }
+
+    for (let i = 1; i <= totalPages; i++) {
+        div.innerHTML += `
+            <button onclick="changePage(${i})">
+                ${i}
+            </button>
+        `
+    }
+
+    if (currentPage < totalPages) {
+        div.innerHTML += `<button onclick="changePage(${currentPage + 1})">→</button>`
+    }
+}
+
+function changePage(page) {
+    currentPage = page
+    renderPage()
 }

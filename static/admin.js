@@ -1,5 +1,21 @@
 const API = ""
 
+function toggleTheme() {
+    document.body.classList.toggle("dark")
+
+    const isDark = document.body.classList.contains("dark")
+    localStorage.setItem("theme", isDark ? "dark" : "light")
+}
+
+function loadTheme() {
+    const saved = localStorage.getItem("theme")
+    if (saved === "dark") {
+        document.body.classList.add("dark")
+    }
+}
+
+window.onload = loadTheme
+
 // ===== COURSE =====
 
 window.createCourse = async function () {
@@ -17,15 +33,39 @@ window.createCourse = async function () {
 
 // ===== LESSON =====
 
-window.createLesson = async function () {
+async function createLesson() {
     const course_id = parseInt(document.getElementById("lessonCourseId").value)
     const title = document.getElementById("lessonTitle").value
     const content = document.getElementById("lessonContent").value
+    const file = document.getElementById("lessonImage").files[0]
 
+    let imageUrl = ""
+
+    // 1. Загружаем файл отдельно
+    if (file) {
+        const formData = new FormData()
+        formData.append("image", file)
+
+        const uploadRes = await fetch("/upload", {
+            method: "POST",
+            body: formData
+        })
+
+        const uploadData = await uploadRes.json()
+        imageUrl = uploadData.url
+    }
+
+    // 2. Создаём урок
     await fetch("/lessons", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ course_id, title, content, position: 1 })
+        body: JSON.stringify({
+            course_id,
+            title,
+            content,
+            image: imageUrl,
+            position: 1
+        })
     })
 
     alert("Lesson created")

@@ -4,8 +4,10 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -70,6 +72,7 @@ func main() {
 
 	http.HandleFunc("/lessons", lessonsHandler)
 	http.HandleFunc("/lessons/", lessonHandler)
+	http.HandleFunc("/upload", uploadHandler)
 
 	http.HandleFunc("/tests/", testHandler)
 	http.HandleFunc("/submit/", submitTestHandler)
@@ -104,7 +107,7 @@ func createTables() {
 		course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,
 		title TEXT,
 		content TEXT,
-		position INTEGERl,
+		position INTEGER,
 		image TEXT
 	);
 
@@ -199,14 +202,14 @@ func lessonsHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 
 	case "GET":
-		rows, _ := db.Query("SELECT id,course_id,title,content,position FROM lessons")
+		rows, _ := db.Query("SELECT id, course_id, title, content, image, position FROM lessons")
 		defer rows.Close()
 
 		list := []Lesson{}
 
 		for rows.Next() {
 			var l Lesson
-			rows.Scan(&l.ID, &l.CourseID, &l.Title, &l.Content, &l.Position)
+			rows.Scan(&l.ID, &l.CourseID, &l.Title, &l.Content, &l.Image, &l.Position)
 			list = append(list, l)
 		}
 
@@ -220,6 +223,7 @@ func lessonsHandler(w http.ResponseWriter, r *http.Request) {
 			"INSERT INTO lessons (course_id, title, content, image, position) VALUES ($1,$2,$3,$4,$5) RETURNING id",
 			l.CourseID, l.Title, l.Content, l.Image, l.Position,
 		).Scan(&l.ID)
+
 		json.NewEncoder(w).Encode(l)
 	}
 }
@@ -232,8 +236,8 @@ func lessonHandler(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 		var l Lesson
 		err := db.QueryRow(
-			"SELECT id,course_id,title,content,position FROM lessons WHERE id=$1", id,
-		).Scan(&l.ID, &l.CourseID, &l.Title, &l.Content, &l.Position)
+			"SELECT id, course_id, title, content, image, position FROM lessons WHERE id=$1", id,
+		).Scan(&l.ID, &l.CourseID, &l.Title, &l.Content, &l.Image, &l.Position)
 
 		if err != nil {
 			http.Error(w, "not found", 404)
@@ -245,6 +249,39 @@ func lessonHandler(w http.ResponseWriter, r *http.Request) {
 	case "DELETE":
 		db.Exec("DELETE FROM lessons WHERE id=$1", id)
 	}
+}
+
+func uploadHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseMultipartForm(10 << 20) // 10MB
+	if err != nil {
+		log.Println("UPLOAD ERROR:", err)
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	file, handler, err := r.FormFile("image")
+	if err != nil {
+		log.Println("UPLOAD ERROR:", err)
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	defer file.Close()
+
+	path := "./static/uploads/" + handler.Filename
+
+	out, err := os.Create(path)
+	if err != nil {
+		log.Println("UPLOAD ERROR:", err)
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	defer out.Close()
+
+	io.Copy(out, file)
+
+	json.NewEncoder(w).Encode(map[string]string{
+		"url": "/static/uploads/" + handler.Filename,
+	})
 }
 
 // ===== TESTS =====
