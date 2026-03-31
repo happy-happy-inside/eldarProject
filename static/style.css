@@ -1,38 +1,61 @@
+:root {
+    --bg: #f5f7fa;
+    --text: #222;
+    --card: #ffffff;
+    --primary: #4CAF50;
+    --border: #ddd;
+}
+
+body.dark {
+    --bg: #1e1e1e;
+    --text: #f1f1f1;
+    --card: #2a2a2a;
+    --primary: #66bb6a;
+    --border: #444;
+}
+
 body {
     font-family: Arial, sans-serif;
-    background: #f5f7fa;
+    background: var(--bg);
+    color: var(--text);
     margin: 0;
     padding: 0;
+    transition: 0.3s;
 }
 
 .container {
-    width: 800px;
+    width: 900px;
     margin: 40px auto;
 }
 
-h1 {
+h1, h2 {
     text-align: center;
 }
 
 .card {
-    background: white;
+    background: var(--card);
     padding: 20px;
     margin: 15px 0;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-3px);
 }
 
 button {
-    background: #4CAF50;
+    background: var(--primary);
     color: white;
     border: none;
     padding: 10px 15px;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
 }
 
 button:hover {
-    background: #45a049;
+    opacity: 0.9;
 }
 
 input, textarea {
@@ -40,15 +63,29 @@ input, textarea {
     padding: 10px;
     margin: 5px 0 10px 0;
     border-radius: 6px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
 }
 
 a {
+    color: var(--primary);
     text-decoration: none;
-    color: #4CAF50;
     font-weight: bold;
 }
 
-hr {
-    margin: 30px 0;
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: var(--card);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.toggle-btn {
+    background: none;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    padding: 5px 10px;
 }

@@ -1,8 +1,23 @@
 const API = ""
 
+function toggleTheme() {
+    document.body.classList.toggle("dark")
+
+    const isDark = document.body.classList.contains("dark")
+    localStorage.setItem("theme", isDark ? "dark" : "light")
+}
+
+function loadTheme() {
+    const saved = localStorage.getItem("theme")
+    if (saved === "dark") {
+        document.body.classList.add("dark")
+    }
+}
+
 // ===== ROUTING =====
 
 window.onload = () => {
+    loadTheme()
     const path = window.location.pathname
 
     if (path === "/") loadCourses()
@@ -21,11 +36,11 @@ async function loadCourses() {
 
     data.forEach(c => {
         div.innerHTML += `
-            <div class="card">
-                <h3>${c.title}</h3>
-                <p>${c.description}</p>
-                <a href="/course?id=${c.id}">Open →</a>
-            </div>
+           <div class="card">
+        <h3>📘 ${c.title}</h3>
+        <p>${c.description}</p>
+        <a href="/course?id=${c.id}">Перейти →</a>
+    </div>
         `
     })
 }
@@ -52,10 +67,10 @@ async function loadCourse() {
         .filter(l => l.course_id === Number(id))
         .forEach(l => {
             div.innerHTML += `
-                <div class="card">
-                    <h3>${l.title}</h3>
-                    <a href="/lesson?id=${l.id}">Open lesson →</a>
-                </div>
+       <div class="card">
+    <h3>📖 ${l.title}</h3>
+    <a href="/lesson?id=${l.id}">Открыть →</a>
+</div>
             `
         })
 }
